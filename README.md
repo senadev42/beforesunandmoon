@@ -7,7 +7,7 @@ BeforeSunAndMoon is a simple CLI tool for terminal stargazing. It allows you to 
 To install BeforeSunAndMoon, you need to have [Go](https://golang.org/doc/install) installed. Once Go is set up, you can install the application using the following command:
 
 ```bash
-go get -u github.com/senadev42/beforesunandmoon
+go install github.com/senadev42/beforesunandmoon@latest
 ```
 
 
