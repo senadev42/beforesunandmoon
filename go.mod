@@ -1,4 +1,4 @@
-module sena/beforesunandmoon
+module github.com/senadev42/beforesunandmoon
 
 go 1.20
 
