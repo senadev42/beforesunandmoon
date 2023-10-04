@@ -54,16 +54,16 @@ func newCoord(coordType string) string {
 	return value
 }
 
+//generate some random coordinates
+//ra := "08:23:07.17" //for testing
+//dec := "-48:29:40.53"
+
 // end goal: build a valid query for this thing
 // https://api.astrocats.space/catalog?ra=21:23:32.16&dec=-53:01:36.08&radius=400
-var FeelingLuckyCmd = &cobra.Command{
-	Use:   "feelinglucky",
+var ExploreCmd = &cobra.Command{
+	Use:   "explore",
 	Short: "Picks a random spot in space and tells you what's there",
 	Run: func(cmd *cobra.Command, args []string) {
-
-		//generate some random coordinates
-		//ra := "08:23:07.17" //for testing
-		//dec := "-48:29:40.53"
 
 		ra := newCoord("ra")
 		dec := newCoord("dec")
@@ -74,26 +74,58 @@ var FeelingLuckyCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("\nCoords\nRA:\t%s\nDEC:\t%s\nRadius:\t%d\n\n", ra, dec, radius)
+		navigate(ra, dec, radius)
 
-		// Build the query URL
-		queryURL := fmt.Sprintf("https://api.astrocats.space/catalog?ra=%s&dec=%s&radius=%d",
-			ra, dec, radius)
+	},
+}
 
-		//get return
-		body := Fetch(queryURL)
+var WhatsHereCmd = &cobra.Command{
+	Use:   "whatshere",
+	Short: "Picks a random spot in space and tells you what's there",
+	Run: func(cmd *cobra.Command, args []string) {
 
-		//PARSING
-		var astrodata map[string]StellarObjectData
-
-		if err := json.Unmarshal([]byte(body), &astrodata); err != nil {
-			fmt.Println("Error unmarshalling JSON:", err)
+		ra, err := cmd.Flags().GetString("ra")
+		if err != nil {
+			fmt.Println("Error fetching ra flag:", err)
 			return
 		}
 
-		tabulator(astrodata)
+		dec, err := cmd.Flags().GetString("dec")
+		if err != nil {
+			fmt.Println("Error fetching dec flag:", err)
+			return
+		}
+
+		radius, err := cmd.Flags().GetInt("radius")
+		if err != nil {
+			fmt.Println("Error fetching radius flag:", err)
+			return
+		}
+
+		navigate(ra, dec, radius)
 
 	},
+}
+
+func navigate(ra string, dec string, radius int) {
+	fmt.Printf("\nCoords\nRA:\t%s\nDEC:\t%s\nRadius:\t%d\n\n", ra, dec, radius)
+
+	// Build the query URL
+	queryURL := fmt.Sprintf("https://api.astrocats.space/catalog?ra=%s&dec=%s&radius=%d",
+		ra, dec, radius)
+
+	//get return
+	body := Fetch(queryURL)
+
+	//PARSING
+	var astrodata map[string]StellarObjectData
+
+	if err := json.Unmarshal([]byte(body), &astrodata); err != nil {
+		fmt.Println("Error unmarshalling JSON:", err)
+		return
+	}
+
+	tabulator(astrodata)
 }
 
 func tabulator(astrodata map[string]StellarObjectData) {
@@ -137,10 +169,27 @@ func Execute() {
 	}
 }
 
+var aboutCmd = &cobra.Command{
+	Use:   "about",
+	Short: "Provides information about RA and DEC",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("\nRA (Right Ascension) and DEC (Declination) are celestial coordinate systems used to locate objects in the sky.")
+		fmt.Println("\nThe expected format for RA is in hours, minutes, and seconds (HH:MM:SS.SS), and for DEC is in degrees, minutes, and seconds (DD:MM:SS.SS). For example, a valid RA value is \"08:23:07.17\", and a valid DEC value is \"-48:29:40.53\".")
+		fmt.Println("\nMore reading: https://skyandtelescope.org/astronomy-resources/right-ascension-declination-celestial-coordinates/")
+	},
+}
+
 func main() {
 
-	FeelingLuckyCmd.Flags().IntP("radius", "r", 5000, "Specify the radius value")
-	RootCmd.AddCommand(FeelingLuckyCmd)
+	ExploreCmd.Flags().IntP("radius", "r", 5000, "Specify the radius value")
+	RootCmd.AddCommand(ExploreCmd)
+
+	WhatsHereCmd.Flags().IntP("radius", "r", 5000, "Specify the radius value")
+	WhatsHereCmd.Flags().StringP("ra", "a", "08:23:07.17", "Specify the ra (Right Ascension) value")
+	WhatsHereCmd.Flags().StringP("dec", "d", "-48:29:40.53", "Specify the dec (Declination) value")
+	RootCmd.AddCommand(WhatsHereCmd)
+
+	RootCmd.AddCommand(aboutCmd)
 
 	// Execute the CLI application
 	Execute()
