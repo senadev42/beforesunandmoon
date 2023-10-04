@@ -3,9 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"math/rand"
-	"net/http"
 	"os"
 	"text/tabwriter"
 	"time"
@@ -64,11 +62,11 @@ var FeelingLuckyCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		//generate some random coordinates
-		//ra, dec := newCoord("ra"), newCoord("dec")
+
 		ra := "08:23:07.17"
 		dec := "-48:29:40.53"
 
-		radius := 10000
+		radius := 15000
 
 		fmt.Printf("\nCoords\nRA:\t%s\nDEC:\t%s\nRadius:\t%d\n\n", ra, dec, radius)
 
@@ -76,23 +74,10 @@ var FeelingLuckyCmd = &cobra.Command{
 		queryURL := fmt.Sprintf("https://api.astrocats.space/catalog?ra=%s&dec=%s&radius=%d",
 			ra, dec, radius)
 
-		// Make API request
-		resp, err := http.Get(queryURL)
-		if err != nil {
-			fmt.Println("Error making API request:", err)
-			return
-		}
-		defer resp.Body.Close()
-
-		// Read the response body
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println("Error reading response body:", err)
-			return
-		}
+		//get return
+		body := Fetch(queryURL)
 
 		//PARSING
-
 		var astrodata map[string]StellarObjectData
 
 		if err := json.Unmarshal([]byte(body), &astrodata); err != nil {
@@ -110,18 +95,28 @@ func tabulator(astrodata map[string]StellarObjectData) {
 	// Create a tab writer
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 
-	fmt.Fprintf(w, "Name\tRA\tDec\tClaimed Type\tDiscover Date\n")
+	fmt.Fprintf(w, "Name\tRA\tDec\tDiscover Date\n")
 
 	// Iterate through the data and print each entry as a row in the table
 	for name, data := range astrodata {
 		// Format the data as needed for the table
-		ra := data.Ra[0].Value
-		dec := data.Dec[0].Value
-		claimedType := data.Claimedtype[0].Value
-		discoverDate := data.Discoverdate[0].Value
+		ra := "n/a"
+		if len(data.Ra) > 0 {
+			ra = data.Ra[0].Value
+		}
+
+		dec := "n/a"
+		if len(data.Dec) > 0 {
+			dec = data.Dec[0].Value
+		}
+
+		discoverDate := "n/a"
+		if len(data.Discoverdate) > 0 {
+			discoverDate = data.Discoverdate[0].Value
+		}
 
 		// Print the row
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", name, ra, dec, claimedType, discoverDate)
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", name, ra, dec, discoverDate)
 	}
 
 	// Flush the tab writer
