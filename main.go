@@ -15,7 +15,7 @@ var RootCmd = &cobra.Command{
 	Use:   "beforesunandmoon",
 	Short: "A simple CLI tool for terminal stargazing",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Please specify a subcommand. Use 'bsam help' for usage.")
+		fmt.Println("Please specify a subcommand. Use 'beforesunandmoon help' for usage.")
 	},
 }
 
@@ -62,11 +62,17 @@ var FeelingLuckyCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		//generate some random coordinates
+		//ra := "08:23:07.17" //for testing
+		//dec := "-48:29:40.53"
 
-		ra := "08:23:07.17"
-		dec := "-48:29:40.53"
+		ra := newCoord("ra")
+		dec := newCoord("dec")
 
-		radius := 15000
+		radius, err := cmd.Flags().GetInt("radius")
+		if err != nil {
+			fmt.Println("Error fetching radius flag:", err)
+			return
+		}
 
 		fmt.Printf("\nCoords\nRA:\t%s\nDEC:\t%s\nRadius:\t%d\n\n", ra, dec, radius)
 
@@ -133,6 +139,7 @@ func Execute() {
 
 func main() {
 
+	FeelingLuckyCmd.Flags().IntP("radius", "r", 5000, "Specify the radius value")
 	RootCmd.AddCommand(FeelingLuckyCmd)
 
 	// Execute the CLI application
