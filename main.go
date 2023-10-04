@@ -34,7 +34,8 @@ func newCoord(coordType string) string {
 		randsign = -1
 	}
 
-	rand.Seed(time.Now().UnixNano())
+	//rand.Seed(time.Now().UnixNano())
+	rand := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	if coordType == "ra" {
 		// For RA, generate hours, minutes, and seconds
