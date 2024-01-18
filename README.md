@@ -2,15 +2,6 @@
 
 BeforeSunAndMoon is a simple CLI tool for terminal stargazing. It allows you to explore random spots in space and provides information about celestial objects using Right Ascension (RA) and Declination (DEC) coordinates.
 
-## Installation
-
-To install BeforeSunAndMoon, you need to have [Go](https://golang.org/doc/install) installed. Once Go is set up, you can install the application using the following command:
-
-```bash
-go install github.com/senadev42/beforesunandmoon@latest
-```
-
-
 ## Usage
 
 ### Explore
