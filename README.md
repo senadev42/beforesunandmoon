@@ -1,6 +1,6 @@
-# BeforeSunAndMoon
+# Before Sun And Moon
 
-BeforeSunAndMoon is a simple CLI tool for terminal stargazing. It allows you to explore random spots in space and provides information about celestial objects using Right Ascension (RA) and Declination (DEC) coordinates.
+beforesunandmoon is a simple CLI tool for terminal stargazing. It allows you to explore random spots in space and provides information about celestial objects using Right Ascension (RA) and Declination (DEC) coordinates.
 
 ## Usage
 
